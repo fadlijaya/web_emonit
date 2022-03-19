@@ -22,8 +22,8 @@ class _PetugasPageState extends State<PetugasPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
-        backgroundColor: kRed,
+        title: Text(title, style: const TextStyle(color: kBlack54, fontWeight: FontWeight.bold)),
+        backgroundColor: kWhite,
       ),
       body: SizedBox(
         width: size.width,

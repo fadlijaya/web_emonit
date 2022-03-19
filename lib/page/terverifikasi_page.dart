@@ -6,22 +6,22 @@ import 'package:web_emonit/theme/padding.dart';
 final Stream<QuerySnapshot> _streamTerverifikasi =
     FirebaseFirestore.instance.collection("terverifikasi").snapshots();
 
-class VerifikasiPage extends StatefulWidget {
-  const VerifikasiPage({Key? key}) : super(key: key);
+class TerverifikasiPage extends StatefulWidget {
+  const TerverifikasiPage({Key? key}) : super(key: key);
 
   @override
-  _VerifikasiPageState createState() => _VerifikasiPageState();
+  _TerverifikasiPageState createState() => _TerverifikasiPageState();
 }
 
-class _VerifikasiPageState extends State<VerifikasiPage> {
+class _TerverifikasiPageState extends State<TerverifikasiPage> {
   @override
   Widget build(BuildContext context) {
     String title = "Data Terverifikasi";
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
-        backgroundColor: kRed,
+        title: Text(title, style: const TextStyle(color: kBlack54, fontWeight: FontWeight.bold)),
+        backgroundColor: kWhite,
       ),
       body: SizedBox(
         width: MediaQuery.of(context).size.width,

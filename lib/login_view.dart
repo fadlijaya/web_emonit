@@ -1,17 +1,18 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:web_emonit/admin_view.dart';
 import 'package:web_emonit/page/dashboard_page.dart';
 import 'package:web_emonit/theme/colors.dart';
 import 'package:web_emonit/theme/padding.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class LoginView extends StatefulWidget {
+  const LoginView({Key? key}) : super(key: key);
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<LoginView> createState() => _LoginViewState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginViewState extends State<LoginView> {
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _controllerEmail = TextEditingController();
@@ -27,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
-            builder: (BuildContext context) => const DashboardPage(),
+            builder: (BuildContext context) => const AdminView(),
           ),
           (route) => false,
         );
@@ -223,7 +224,7 @@ class _LoginPageState extends State<LoginPage> {
                 password: _controllerPassword.text);
             Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => const DashboardPage()),
+                MaterialPageRoute(builder: (context) => const AdminView()),
                 (route) => false);
           } on FirebaseAuthException catch (e) {
             if (e.code == 'user-not-found') {

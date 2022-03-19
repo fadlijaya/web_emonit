@@ -1,11 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:web_emonit/page/drawer_navigation/kunjungan_page.dart';
-import 'package:web_emonit/page/drawer_navigation/penolakan_page.dart';
-import 'package:web_emonit/page/drawer_navigation/petugas_page.dart';
-import 'package:web_emonit/page/drawer_navigation/verifikasi_page.dart';
-import 'package:web_emonit/page/login_page.dart';
+import 'package:web_emonit/login_view.dart';
 import 'package:web_emonit/theme/colors.dart';
 import 'package:web_emonit/theme/padding.dart';
 
@@ -46,71 +42,24 @@ class _DashboardPageState extends State<DashboardPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
-        backgroundColor: kRed,
-      ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            drawerHeader(),
-            ListTile(
-              onTap: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const PetugasPage())),
-              leading: const Icon(
-                Icons.account_circle,
-              ),
-              title: const Text(
-                "Data Petugas",
-              ),
-            ),
-            ListTile(
-              onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const KunjunganPage())),
-              leading: const Icon(
-                Icons.timelapse,
-              ),
-              title: const Text(
-                "Data Kunjungan",
-              ),
-            ),
-            ListTile(
-              onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const VerifikasiPage())),
-              leading: const Icon(Icons.verified),
-              title: const Text(
-                "Data Terverifikasi",
-              ),
-            ),
-            ListTile(
-              onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const PenolakanPage())),
-              leading: const Icon(
-                Icons.close,
-              ),
-              title: const Text(
-                "Data Penolakan",
-              ),
-            ),
-            const Divider(
-              thickness: 1,
-            ),
-            ListTile(
-              onTap: logout,
-              leading: const Icon(
+        title: Text(title, style: const TextStyle(color: kBlack54, fontWeight: FontWeight.bold),),
+        backgroundColor: kWhite,
+        actions: [
+          Padding(padding: const EdgeInsets.only(right: 12,), child: CircleAvatar(
+            backgroundColor: kWhite,
+            child: Image.asset("assets/admin.jpg", width: 30,),
+          ),),
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: IconButton(
+              onPressed: logout,
+              icon: const Icon(
                 Icons.exit_to_app,
-              ),
-              title: const Text(
-                "Log out",
+                color: kRed,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       body: Container(
         width: size.width,
@@ -190,7 +139,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(
-                    height: 12,
+                    height: 8,
                   ),
                   const Text('Petugas',
                       style: TextStyle(
@@ -386,8 +335,10 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Future<void> logout() async {
-    await FirebaseAuth.instance
-        .signOut()
-        .then((_) => Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage()), (route) => false));
+    await FirebaseAuth.instance.signOut().then((_) =>
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginView()),
+            (route) => false));
   }
 }

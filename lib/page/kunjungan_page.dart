@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:web_emonit/page/drawer_navigation/petugas_page.dart';
+import 'package:web_emonit/page/petugas_page.dart';
 import 'package:web_emonit/theme/colors.dart';
 import 'package:web_emonit/theme/padding.dart';
 
@@ -24,8 +24,8 @@ class _KunjunganPageState extends State<KunjunganPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
-        backgroundColor: kRed,
+        title: Text(title, style: const TextStyle(color: kBlack54, fontWeight: FontWeight.bold)),
+        backgroundColor: kWhite,
       ),
       body: SizedBox(
         width: MediaQuery.of(context).size.width,
@@ -629,10 +629,12 @@ class _DetailKunjunganPageState extends State<DetailKunjunganPage> {
       'status verifikasi': statusVerifikasi1,
       'tanggal verifikasi': tglVerifikasi
     }).then((_) {
-      updateStatusKunjungan1();
-      updateStatusUsersKunjungan1();
-      Future.delayed(const Duration(seconds: 2), () {
-        Navigator.pushNamed(context, '/verifikasi');
+      setState(() {
+        updateStatusKunjungan1();
+        updateStatusUsersKunjungan1();
+        Future.delayed(const Duration(seconds: 2), () {
+          Navigator.pushNamed(context, '/verifikasi');
+        });
       });
     });
   }

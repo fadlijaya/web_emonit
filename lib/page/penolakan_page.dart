@@ -20,8 +20,8 @@ class _PenolakanPageState extends State<PenolakanPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
-        backgroundColor: kRed,
+        title: Text(title, style: const TextStyle(color: kBlack54, fontWeight: FontWeight.bold)),
+        backgroundColor: kWhite,
       ),
       body: SizedBox(
         width: MediaQuery.of(context).size.width,
