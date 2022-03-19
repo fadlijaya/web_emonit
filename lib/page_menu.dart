@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:web_emonit/theme/colors.dart';
@@ -48,17 +50,29 @@ class PageMenu extends ConsumerWidget {
     return Scaffold(
       backgroundColor: kRed,
       appBar: AppBar(
-        leading: Image.asset("assets/logo_telkom.png", width: 30,),
-        title: const Text('ADMIN PAGE'), backgroundColor: kRed,),
-      body: ListView(
-        children: <Widget>[
-          for (var pageName in _availablePages.keys)
-            PageListTile(
-              // 4. pass the selectedPageName as an argument
-              selectedPageName: selectedPageName,
-              pageName: pageName,
-              onPressed: () => _selectPage(context, ref, pageName),
+        leading: Image.asset(
+          "assets/logo_telkom.png",
+          width: 30,
+        ),
+        title: const Text('ADMIN PAGE'),
+        backgroundColor: kRed,
+      ),
+      body: Column(
+        children: [
+          GetAdmin(name: _name.toString(), email: _email.toString()),
+          Expanded(
+            child: ListView(
+              children: <Widget>[
+                for (var pageName in _availablePages.keys)
+                  PageListTile(
+                    // 4. pass the selectedPageName as an argument
+                    selectedPageName: selectedPageName,
+                    pageName: pageName,
+                    onPressed: () => _selectPage(context, ref, pageName),
+                  ),
+              ],
             ),
+          ),
         ],
       ),
     );
@@ -83,11 +97,77 @@ class PageListTile extends StatelessWidget {
       // and all the titles are left-aligned
       leading: Opacity(
         opacity: selectedPageName == pageName ? 1.0 : 0.0,
-        child: const Icon(Icons.check, color: kWhite,),
+        child: const Icon(
+          Icons.check,
+          color: kWhite,
+        ),
       ),
-      title: Text(pageName, style: const TextStyle(color: kWhite, fontWeight: FontWeight.w500),),
+      title: Text(
+        pageName,
+        style: const TextStyle(color: kWhite, fontWeight: FontWeight.w500),
+      ),
       onTap: onPressed,
     );
   }
 }
 
+String? _uid;
+String? _name;
+String? _email;
+
+class GetAdmin extends StatefulWidget {
+  final String name;
+  final String email;
+  const GetAdmin({Key? key, required this.name, required this.email})
+      : super(key: key);
+
+  @override
+  State<GetAdmin> createState() => _GetAdminState();
+}
+
+class _GetAdminState extends State<GetAdmin> {
+
+  Future<dynamic> getAdmin() async {
+    await FirebaseFirestore.instance
+        .collection('admin')
+        .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .get()
+        .then((result) {
+      if (result.docs.isNotEmpty) {
+        setState(() {
+          _uid = result.docs[0].data()['uid'];
+          _name = result.docs[0].data()['nama'];
+          _email = result.docs[0].data()['email'];
+        });
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    getAdmin();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: paddingDefault),
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 36,
+            backgroundColor: kWhite,
+            child: Image.asset("assets/admin.jpg", width: 48,)
+          ),
+          const SizedBox(height: 12,),
+          Text("$_name", style: const TextStyle(color: kWhite, fontSize: 16),), 
+          const SizedBox(height: 4),
+          Text("$_email", style: const TextStyle(color: kWhite),),
+          const SizedBox(height: 12,),
+          const Divider(thickness: 0.1, color: kWhite,)
+        ],
+      ),
+    );
+  }
+}

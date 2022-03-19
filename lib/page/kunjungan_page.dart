@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:web_emonit/page/pdf_page.dart';
 import 'package:web_emonit/page/petugas_page.dart';
 import 'package:web_emonit/theme/colors.dart';
 import 'package:web_emonit/theme/padding.dart';
@@ -24,8 +25,22 @@ class _KunjunganPageState extends State<KunjunganPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(title, style: const TextStyle(color: kBlack54, fontWeight: FontWeight.bold)),
+        title: Text(title,
+            style:
+                const TextStyle(color: kBlack54, fontWeight: FontWeight.bold)),
         backgroundColor: kWhite,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: paddingDefault),
+            child: IconButton(
+                onPressed: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const PdfPage())),
+                icon: const Icon(
+                  Icons.print,
+                  color: kBlack54,
+                )),
+          )
+        ],
       ),
       body: SizedBox(
         width: MediaQuery.of(context).size.width,
@@ -463,20 +478,20 @@ class _DetailKunjunganPageState extends State<DetailKunjunganPage> {
                       const SizedBox(
                         height: 12,
                       ),
-                      const Text(
-                        "Foto Kunjungan",
-                        style: TextStyle(color: kBlack54),
-                      ),
-                      const SizedBox(
-                        height: 12,
-                      ),
-                      Container(
-                        width: double.infinity,
-                        height: 160,
-                        decoration: BoxDecoration(
-                            image: DecorationImage(
-                                fit: BoxFit.cover,
-                                image: NetworkImage(widget.fileFoto))),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Foto Kunjungan",
+                            style: TextStyle(color: kBlack54),
+                          ),
+                          TextButton(
+                              onPressed: () => lihatFoto(widget.fileFoto),
+                              child: const Text(
+                                "Lihat Foto",
+                                style: TextStyle(color: kGreen),
+                              )),
+                        ],
                       ),
                       const SizedBox(
                         height: 24,
@@ -513,6 +528,25 @@ class _DetailKunjunganPageState extends State<DetailKunjunganPage> {
         ),
       ),
     );
+  }
+
+  lihatFoto(fileFoto) {
+    showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+              title: Column(
+            children: [
+              Container(
+                width: 640,
+                height: 320,
+                decoration: BoxDecoration(
+                    image: DecorationImage(
+                        image: NetworkImage(fileFoto), fit: BoxFit.cover)),
+              ),
+            ],
+          ));
+        });
   }
 
   Widget buttonValid() {
@@ -629,12 +663,10 @@ class _DetailKunjunganPageState extends State<DetailKunjunganPage> {
       'status verifikasi': statusVerifikasi1,
       'tanggal verifikasi': tglVerifikasi
     }).then((_) {
-      setState(() {
-        updateStatusKunjungan1();
-        updateStatusUsersKunjungan1();
-        Future.delayed(const Duration(seconds: 2), () {
-          Navigator.pushNamed(context, '/verifikasi');
-        });
+      updateStatusKunjungan1();
+      updateStatusUsersKunjungan1();
+      Future.delayed(const Duration(seconds: 2), () {
+        alertDialog();
       });
     });
   }
@@ -661,8 +693,39 @@ class _DetailKunjunganPageState extends State<DetailKunjunganPage> {
       updateStatusKunjungan2();
       updateStatusUsersKunjungan2();
       Future.delayed(const Duration(seconds: 2), () {
-        Navigator.pushNamed(context, '/penolakan');
+        alertDialog();
       });
     });
+  }
+
+  alertDialog() {
+    showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Icon(
+                  Icons.check_circle_rounded,
+                  color: kGreen,
+                  size: 48,
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+                Text(
+                  "Berhasil Diverifikasi",
+                  style: TextStyle(color: kBlack54),
+                )
+              ],
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Center(child: Text("OK", style: TextStyle(color: kBlack54),)))
+            ],
+          );
+        });
   }
 }

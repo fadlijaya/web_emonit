@@ -42,13 +42,12 @@ class _DashboardPageState extends State<DashboardPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(title, style: const TextStyle(color: kBlack54, fontWeight: FontWeight.bold),),
+        title: Text(
+          title,
+          style: const TextStyle(color: kBlack54, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: kWhite,
         actions: [
-          Padding(padding: const EdgeInsets.only(right: 12,), child: CircleAvatar(
-            backgroundColor: kWhite,
-            child: Image.asset("assets/admin.jpg", width: 30,),
-          ),),
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: IconButton(
@@ -77,6 +76,13 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
       ),
     );
+  }
+
+  popupMenuButton() {
+    PopupMenuButton(itemBuilder: (context) {
+      return <PopupMenuEntry<String>>[
+        PopupMenuItem<String>(child: Text("$_name"))];
+    });
   }
 
   Widget drawerHeader() {
