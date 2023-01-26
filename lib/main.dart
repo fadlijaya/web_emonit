@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:web_emonit/admin_view.dart';
 import 'package:web_emonit/firebase_options.dart';
 import 'package:web_emonit/login_view.dart';
 import 'package:web_emonit/theme/colors.dart';
@@ -28,10 +29,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
           primarySwatch: Colors.blue,
           primaryColor: kWhite,
+          fontFamily: 'Montserrat', 
           inputDecorationTheme: const InputDecorationTheme(
             labelStyle: TextStyle(color: kWhite),
-          ),
-          backgroundColor: kWhite),
+          ),),
       home: const LoginView()
     );
   }

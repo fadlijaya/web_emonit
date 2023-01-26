@@ -6,7 +6,7 @@ class SplitView extends StatelessWidget {
     required this.menu,
     required this.content,
     this.breakpoint = 600,
-    this.menuWidth = 240,
+    this.menuWidth = 300,
   }) : super(key: key);
   final Widget menu;
   final Widget content;

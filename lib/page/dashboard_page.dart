@@ -2,14 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:web_emonit/login_view.dart';
+import 'package:web_emonit/page/maps_page.dart';
 import 'package:web_emonit/theme/colors.dart';
 import 'package:web_emonit/theme/padding.dart';
+import 'package:web_emonit/utils/constants.dart';
 
 final Stream<QuerySnapshot> _streamPetugas =
     FirebaseFirestore.instance.collection("users").snapshots();
 
-final Stream<QuerySnapshot> _streamKunjungan =
-    FirebaseFirestore.instance.collection("kunjungan").snapshots();
+final Stream<QuerySnapshot> _streamKunjungan = FirebaseFirestore.instance
+    .collection("kunjungan")
+    .orderBy('tanggal kunjungan', descending: true)
+    .snapshots();
 
 final Stream<QuerySnapshot> _streamTerverifikasi =
     FirebaseFirestore.instance.collection("terverifikasi").snapshots();
@@ -37,41 +41,51 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    String title = "Dashboard";
     Size size = MediaQuery.of(context).size;
-
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          title,
-          style: const TextStyle(color: kBlack54, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: kWhite,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: IconButton(
-              onPressed: logout,
-              icon: const Icon(
-                Icons.exit_to_app,
-                color: kRed,
-              ),
-            ),
-          ),
-        ],
-      ),
       body: Container(
         width: size.width,
         height: size.height,
         padding: const EdgeInsets.all(8),
-        child: GridView.count(
-          crossAxisCount: 4,
-          childAspectRatio: 1.5,
+        child: Stack(
           children: [
-            cardPetugas(),
-            cardKunjungan(),
-            cardTerverifikasi(),
-            cardPenolakan()
+            buildHeaderDashboard(context),
+            Positioned.fill(
+              left: 0,
+              top: 80,
+              bottom: 0,
+              child: GridView.count(
+                crossAxisCount: 4,
+                childAspectRatio: 1.7,
+                children: [
+                  cardPetugas(),
+                  cardKunjungan(),
+                  cardTerverifikasi(),
+                  cardPenolakan()
+                ],
+              ),
+            ),
+            const Positioned.fill(
+                left: 0,
+                top: 320,
+                bottom: 0,
+                child: Padding(
+                  padding: EdgeInsets.only(left: paddingDefault),
+                  child: Text(
+                    "Petugas Kunjungan Mitra Binaan",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                )),
+            Positioned.fill(
+                left: 0,
+                top: 340,
+                bottom: 0,
+                child: SingleChildScrollView(
+                  child: Container(
+                    padding: const EdgeInsets.all(paddingDefault),
+                    child: buildKunjunganPetugas(),
+                  ),
+                ))
           ],
         ),
       ),
@@ -81,8 +95,87 @@ class _DashboardPageState extends State<DashboardPage> {
   popupMenuButton() {
     PopupMenuButton(itemBuilder: (context) {
       return <PopupMenuEntry<String>>[
-        PopupMenuItem<String>(child: Text("$_name"))];
+        PopupMenuItem<String>(child: Text("$_name"))
+      ];
     });
+  }
+
+  Widget buildHeaderDashboard(context) {
+    return Container(
+      padding: const EdgeInsets.all(paddingDefault),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            titleDashboard,
+            style: TextStyle(
+                color: kBlack, fontSize: 30, fontWeight: FontWeight.bold),
+          ),
+          IconButton(
+            onPressed: logout,
+            icon: const Icon(
+              Icons.exit_to_app,
+              color: kRed,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildKunjunganPetugas() {
+    return StreamBuilder<QuerySnapshot>(
+        stream: _streamKunjungan,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const LinearProgressIndicator();
+          }
+
+          return DataTable(columns: const [
+            DataColumn(
+                label: Text(
+              "Nama Petugas",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            )),
+            DataColumn(
+                label: Text("Hari/Tanggal",
+                    style: TextStyle(fontWeight: FontWeight.bold))),
+            DataColumn(
+                label: Text("Koordinat",
+                    style: TextStyle(fontWeight: FontWeight.bold))),
+            DataColumn(
+              label:
+                  Text("Lokasi", style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            DataColumn(
+                label:
+                    Text("Foto", style: TextStyle(fontWeight: FontWeight.bold)))
+          ], rows: buildList(context, snapshot.data!.docs));
+        });
+  }
+
+  List<DataRow> buildList(
+      BuildContext context, List<DocumentSnapshot> snapshot) {
+    return snapshot.map((data) => buildListItem(context, data)).toList();
+  }
+
+  DataRow buildListItem(BuildContext context, DocumentSnapshot data) {
+    return DataRow(cells: [
+      DataCell(Text("${data['nama petugas']}")),
+      DataCell(Text("${data['tanggal kunjungan']}")),
+      DataCell(Text(
+          "Lat : ${data['koordinat lokasi'].latitude}, Lon : ${data['koordinat lokasi'].longitude}")),
+      DataCell(Text("${data['alamat']}")),
+      DataCell(TextButton(
+          onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MapsPage(
+                      namaMitra: data['nama mitra binaan'],
+                      foto: data['file foto'],
+                      koordinatLokasi: data['koordinat lokasi']))),
+          child: Text("Lihat"))),
+    ]);
   }
 
   Widget drawerHeader() {

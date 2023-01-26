@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:web_emonit/admin_view.dart';
 import 'package:web_emonit/theme/colors.dart';
 import 'package:web_emonit/theme/padding.dart';
+import 'package:web_emonit/utils/constants.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({Key? key}) : super(key: key);
@@ -23,7 +24,7 @@ class _LoginViewState extends State<LoginView> {
   @override
   void initState() {
     if (FirebaseAuth.instance.currentUser != null) {
-       WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
@@ -49,7 +50,7 @@ class _LoginViewState extends State<LoginView> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Flexible(child: image()),
+            image(),
             formLogin(),
           ],
         ),
@@ -61,8 +62,23 @@ class _LoginViewState extends State<LoginView> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Image.network(
-          "https://tedis.telkom.design/assets/download_logo/logo-telkom-putih.png",
+        SizedBox(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.asset(
+              "assets/logo_telkom.png", width: 480,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  alignment: Alignment.center,
+                  child: const Text(
+                    "480 x 480",
+                    style: TextStyle(fontSize: 120, color: kWhite),
+                  ),
+                );
+              },
+            ),
+          ),
         ),
         header(),
       ],
@@ -109,7 +125,7 @@ class _LoginViewState extends State<LoginView> {
               Row(
                 children: const [
                   Text(
-                    'Login',
+                    titleLogin,
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 24,

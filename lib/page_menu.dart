@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:web_emonit/theme/colors.dart';
 import 'package:web_emonit/theme/padding.dart';
 
@@ -49,16 +50,9 @@ class PageMenu extends ConsumerWidget {
     final selectedPageName = ref.watch(selectedPageNameProvider.state).state;
     return Scaffold(
       backgroundColor: kRed,
-      appBar: AppBar(
-        leading: Image.asset(
-          "assets/logo_telkom.png",
-          width: 30,
-        ),
-        title: const Text('ADMIN PAGE'),
-        backgroundColor: kRed,
-      ),
       body: Column(
         children: [
+          Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Image.asset("assets/logo_telkom.png", width: 160,)),
           GetAdmin(name: _name.toString(), email: _email.toString()),
           Expanded(
             child: ListView(
@@ -161,7 +155,7 @@ class _GetAdminState extends State<GetAdmin> {
             child: Image.asset("assets/admin.jpg", width: 48,)
           ),
           const SizedBox(height: 12,),
-          Text("$_name", style: const TextStyle(color: kWhite, fontSize: 16),), 
+          Text("$_name", style: const TextStyle(color: kWhite, fontSize: 24, fontWeight: FontWeight.bold),), 
           const SizedBox(height: 4),
           Text("$_email", style: const TextStyle(color: kWhite),),
           const SizedBox(height: 12,),

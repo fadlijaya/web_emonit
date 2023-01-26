@@ -9,9 +9,12 @@ class AdminView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedPageBuilder = ref.watch(selectedPageBuilderProvider);
-    
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      initialRoute: "/",
+      routes: {
+        '/adminView': (context) => const AdminView()
+      },
       home: SplitView(menu: const PageMenu(), content: selectedPageBuilder(context)),
     );
   }

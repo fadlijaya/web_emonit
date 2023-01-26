@@ -1,14 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:web_emonit/page/pdf_page.dart';
 import 'package:web_emonit/page/petugas_page.dart';
 import 'package:web_emonit/theme/colors.dart';
 import 'package:web_emonit/theme/padding.dart';
+import 'package:web_emonit/utils/constants.dart';
 
 final Stream<QuerySnapshot> _streamKunjungan = FirebaseFirestore.instance
     .collection("kunjungan")
-    .orderBy("tanggal kunjungan")
+    .orderBy("tanggal kunjungan", descending: true)
     .snapshots();
 
 class KunjunganPage extends StatefulWidget {
@@ -21,160 +24,239 @@ class KunjunganPage extends StatefulWidget {
 class _KunjunganPageState extends State<KunjunganPage> {
   @override
   Widget build(BuildContext context) {
-    String title = "Data Kunjungan";
-
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(title,
-            style:
-                const TextStyle(color: kBlack54, fontWeight: FontWeight.bold)),
-        backgroundColor: kWhite,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: paddingDefault),
-            child: IconButton(
-                onPressed: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const PdfPage())),
-                icon: const Icon(
-                  Icons.print,
-                  color: kBlack54,
-                )),
-          )
-        ],
-      ),
-      body: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        child: streamBuilder(),
-      ),
+      body: Container(
+          width: size.width,
+          height: size.height,
+          padding: const EdgeInsets.all(paddingDefault),
+          child: Stack(
+            children: [
+              buildHeader(),
+              buildDataKunjungan(),
+            ],
+          )),
     );
   }
 
-  Widget streamBuilder() {
-    return StreamBuilder<QuerySnapshot>(
-        stream: _streamKunjungan,
-        builder: ((context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (snapshot.hasError) {
-            return const Center(
-              child: Text("Error!"),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(
-              child: Text(
-                "Belum Ada Data!",
-                style: TextStyle(color: kBlack54),
-              ),
-            );
-          } else {
-            return ListView(
-                children: snapshot.data!.docs.map((DocumentSnapshot data) {
-              return Container(
-                padding: const EdgeInsets.all(8),
-                child: ListTile(
-                  onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => DetailKunjunganPage(
-                              docId: data['docId'],
-                              uid: data['uid'],
-                              tanggalKunjungan: data['tanggal kunjungan'],
-                              nomorHp: data['nomor HP'],
-                              namaMB: data['nama mitra binaan'],
-                              namaLokasi: data['nama lokasi'],
-                              koordinatLokasi: data['koordinat lokasi'],
-                              kodeMB: data['kode mitra binaan'],
-                              keterangan: data['keterangan'],
-                              fileFoto: data['file foto'],
-                              alamat: data['alamat'],
-                              statusVerifikasi: data['status verifikasi']))),
-                  title: Row(
-                    children: [
-                      Text(
-                        "${data['nama mitra binaan']}",
-                        style: const TextStyle(
-                            color: kBlack54, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(
-                        width: 4,
-                      ),
-                      const Text("|"),
-                      const SizedBox(
-                        width: 4,
-                      ),
-                      Text(
-                        "${data['kode mitra binaan']}",
-                        style: const TextStyle(
-                          color: kBlack54,
-                        ),
-                      ),
-                    ],
+  Widget buildHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Text(titleDataKunjungan, style: TextStyle(fontSize: 20, color: kBlack, fontWeight: FontWeight.bold),),
+        IconButton(
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const PdfPage())),
+            icon: const Icon(
+              Icons.print,
+              color: kBlack54,
+            )),
+      ],
+    );
+  }
+
+  Widget buildDataKunjungan() {
+    return Positioned.fill(
+      top: 60,
+      left: 0,
+      bottom: 0,
+      child: StreamBuilder<QuerySnapshot>(
+          stream: _streamKunjungan,
+          builder: ((context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.hasError) {
+              return const Center(
+                child: Text("Error!"),
+              );
+            } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(
+                    "assets/no_data.svg",
+                    width: 120,
                   ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(
-                        height: 8,
-                      ),
-                      Text("${data['nama lokasi']}"),
-                      const SizedBox(
-                        height: 8,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            "${data['tanggal kunjungan']}",
-                            style: const TextStyle(fontSize: 12),
+                  const Padding(
+                    padding: EdgeInsets.only(top: 16),
+                    child: Text(
+                      "Belum Ada Data!",
+                      style: TextStyle(fontSize: 16, color: kBlack54),
+                    ),
+                  ),
+                ],
+              );
+            } else {
+              return ListView(
+                  children: snapshot.data!.docs.map((DocumentSnapshot data) {
+                return Container(
+                  padding: const EdgeInsets.all(8),
+                  child: ListTile(
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => DetailKunjunganPage(
+                                docId: data['docId'],
+                                uid: data['uid'],
+                                tanggalKunjungan: data['tanggal kunjungan'],
+                                nomorHp: data['nomor HP'],
+                                namaMB: data['nama mitra binaan'],
+                                namaLokasi: data['nama lokasi'],
+                                koordinatLokasi: data['koordinat lokasi'],
+                                kodeMB: data['kode mitra binaan'],
+                                keterangan: data['keterangan'],
+                                fileFoto: data['file foto'],
+                                alamat: data['alamat'],
+                                statusVerifikasi: data['status verifikasi']))),
+                    title: Row(
+                      children: [
+                        Text(
+                          "${data['nama mitra binaan']}",
+                          style: const TextStyle(
+                              color: kBlack54, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(
+                          width: 4,
+                        ),
+                        const Text("|"),
+                        const SizedBox(
+                          width: 4,
+                        ),
+                        Text(
+                          "${data['kode mitra binaan']}",
+                          style: const TextStyle(
+                            color: kBlack54,
                           ),
-                        ],
-                      ),
-                      data['status verifikasi'] == ""
-                          ? Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
+                        ),
+                      ],
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        Text("${data['nama lokasi']}"),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              "${data['tanggal kunjungan']}",
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                        data['status verifikasi'] == ""
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: const [
+                                  Icon(
+                                    Icons.timelapse,
+                                    size: 16,
+                                    color: kRed,
+                                  ),
+                                  SizedBox(
+                                    width: 4,
+                                  ),
+                                  Text(
+                                    "Dalam Proses Pemeriksaan",
+                                    style: TextStyle(color: kRed, fontSize: 12),
+                                  ),
+                                ],
+                              )
+                            : Row(
+                                children: const [
+                                  Icon(
+                                    Icons.check,
+                                    size: 16,
+                                    color: kGreen,
+                                  ),
+                                  SizedBox(
+                                    width: 4,
+                                  ),
+                                  Text("Telah Diperiksa",
+                                      style:
+                                          TextStyle(color: kGreen, fontSize: 12)),
+                                ],
+                              ),
+                        const Divider(
+                          thickness: 2,
+                        )
+                      ],
+                    ),
+                    trailing: PopupMenuButton(
+                      itemBuilder: (BuildContext context) {
+                        return <PopupMenuEntry<String>>[
+                          PopupMenuItem<String>(
+                            value: 'hapus',
+                            child: Row(
                               children: const [
-                                Icon(
-                                  Icons.timelapse,
-                                  size: 16,
-                                  color: kRed,
-                                ),
-                                SizedBox(
-                                  width: 4,
-                                ),
-                                Text(
-                                  "Dalam Proses Pemeriksaan",
-                                  style: TextStyle(color: kRed, fontSize: 12),
-                                ),
-                              ],
-                            )
-                          : Row(
-                              children: const [
-                                Icon(
-                                  Icons.check,
-                                  size: 16,
-                                  color: kGreen,
-                                ),
-                                SizedBox(
-                                  width: 4,
-                                ),
-                                Text("Telah Diperiksa",
-                                    style:
-                                        TextStyle(color: kGreen, fontSize: 12)),
+                                Icon(Icons.delete),
+                                Padding(
+                                  padding: EdgeInsets.only(left: 4),
+                                  child: Text("Hapus"),
+                                )
                               ],
                             ),
-                      const Divider(
-                        thickness: 2,
-                      )
-                    ],
+                          )
+                        ];
+                      },
+                      onSelected: (String value) async {
+                        if (value == 'hapus') {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('Konfirmasi'),
+                                content: Text(
+                                    'Apa kamu ingin menghapus Akun dari ${data['nama mitra binaan']}?'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: Text('Tidak'),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                  TextButton(
+                                    child: Text('Hapus'),
+                                    onPressed: () {
+                                      data.reference.delete();
+                                      FirebaseFirestore.instance
+                                          .collection("users")
+                                          .doc(data['uid'])
+                                          .collection("kunjungan")
+                                          .doc(data['docId'])
+                                          .delete();
+                                      Navigator.pop(context);
+                                      Fluttertoast.showToast(
+                                          msg: "Data Berhasil Terhapus!",
+                                          toastLength: Toast.LENGTH_SHORT,
+                                          gravity: ToastGravity.BOTTOM,
+                                          timeInSecForIosWeb: 1,
+                                          backgroundColor: Colors.green,
+                                          textColor: Colors.white,
+                                          fontSize: 16.0);
+                                      setState(() {});
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
+                      },
+                    ),
                   ),
-                ),
-              );
-            }).toList());
-          }
-        }));
+                );
+              }).toList());
+            }
+          })),
+    );
   }
 }
 
@@ -253,7 +335,6 @@ class _DetailKunjunganPageState extends State<DetailKunjunganPage> {
                   String _nik = data['nik'];
                   String _phoneNumber = data['nomor hp'];
                   String _workLocation = data['lokasi kerja'];
-                  String _noKtp = data['ktp'];
                   String _noKk = data['kk'];
                   String _gender = data['jenis kelamin'];
                   String _religion = data['agama'];
@@ -308,7 +389,6 @@ class _DetailKunjunganPageState extends State<DetailKunjunganPage> {
                                           jenisKelamin: _gender,
                                           nik: _nik,
                                           noKk: _noKk,
-                                          noKtp: _noKtp,
                                           ttl: _placeBirth))),
                               child: const Text(
                                 "Lihat Detail",
@@ -723,7 +803,11 @@ class _DetailKunjunganPageState extends State<DetailKunjunganPage> {
             actions: [
               TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Center(child: Text("OK", style: TextStyle(color: kBlack54),)))
+                  child: const Center(
+                      child: Text(
+                    "OK",
+                    style: TextStyle(color: kBlack54),
+                  )))
             ],
           );
         });

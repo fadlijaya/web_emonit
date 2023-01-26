@@ -11,7 +11,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  firebase_core_platform_interface: 4.5.1
   firebase_auth: ^3.3.6
   firebase_core: ^1.12.0
   firebase_storage: ^10.2.7
@@ -20,6 +20,15 @@ dependencies:
   flutter_riverpod: ^1.0.3
   intl: ^0.17.0
   printing: ^5.7.2
+  fluttertoast: ^8.0.9
+  data_table_2: ^2.2.1
+  geolocator: ^8.0.0
+  geocoding: ^2.0.2
+  google_maps_flutter: ^2.1.0
+  google_maps_flutter_web: ^0.4.0+3
+  location: ^4.4.0
+  map_picker: ^0.0.3
+  flutter_svg: ^1.1.6
 
   cupertino_icons: ^1.0.2
 
@@ -31,6 +40,22 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
   assets:
    - assets/logo_telkom.png
    - assets/admin.jpg
+   - assets/no_data.svg
+
+  fonts:
+    - family: Montserrat
+      fonts:
+        - asset: fonts/Montserrat-Light.ttf
+          weight: 300
+        - asset: fonts/Montserrat-Regular.ttf
+          weight: 400
+        - asset: fonts/Montserrat-Medium.ttf
+          weight: 500
+        - asset: fonts/Montserrat-SemiBold.ttf
+          weight: 600
+        - asset: fonts/Montserrat-Bold.ttf
+          weight: 700

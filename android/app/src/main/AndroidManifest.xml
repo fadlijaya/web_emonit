@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.web_emonit">
    <application
-        android:label="web_emonit"
+        android:label="e-Monit"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
